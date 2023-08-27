@@ -1,13 +1,12 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+
 
 public class SeleniumTest {
 
@@ -18,65 +17,61 @@ public class SeleniumTest {
 
     @BeforeTest
 
-    public static void Setup(){
+    public static void Setup() {
 
         options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
-        System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir")+"/src/test/resources/chromedriver.exe");
-        driver = new ChromeDriver(options);
-        driver.get("https://flights-app.pages.dev/");
+        System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "/src/test/resources/chromedriver.exe");
+        driver = new ChromeDriver(options);//connecting web server via chromedriver that is shared
+        driver.get("https://flights-app.pages.dev/");//it includes the URL of the flight site
 
 
     }
 
     @Test
-    void teststeps(){
-
+    void teststeps() {
+        //in order to automate the test we used xpath method that is able to call the elements on the UI
         driver.findElement(By.xpath("//*[@id=\"headlessui-combobox-input-:Rq9lla:\"]")).sendKeys("Istanbul");
         driver.findElement(By.xpath("//*[@id=\"headlessui-combobox-option-:r0:\"]")).click();
         driver.findElement(By.xpath("//*[@id=\"headlessui-combobox-input-:Rqhlla:\"]")).sendKeys("Los Angeles");
         driver.findElement(By.xpath("//*[@id=\"headlessui-combobox-options-:R1qhlla:\"]")).click();
-
+        //to write for the flight destinations automatically it is used 'sendKeys'
+        //to click them automatically for selection it is used 'click'
     }
+
     @Test
-    void teststeps2(){
+    void teststeps2() {
 
         driver.findElement(By.xpath("//*[@id=\"headlessui-combobox-input-:Rq9lla:\"]")).sendKeys("Istanbul");
         driver.findElement(By.xpath("//*[@id=\"headlessui-combobox-option-:r0:\"]")).click();
         driver.findElement(By.xpath("//*[@id=\"headlessui-combobox-input-:Rqhlla:\"]")).sendKeys("Istanbul");
         driver.findElement(By.xpath("//*[@id=\"headlessui-combobox-options-:R1qhlla:\"]")).click();
-        LOGGER.info("There is an error in the teststeps2");
+        LOGGER.info("There is an error in the teststeps2");//warning message for the tester in the log
         System.out.println("Error! You cannot insert same city. Please select another city!");
+        //when both of the destinations are the same, then it is printed out the error message on the running result screen
+
 
     }
-    @Test
-    void teststeps3(){
 
-        try{
+
+        @Test
+        void compareListElements() {
 
             teststeps();
-            driver.findElement(By.xpath("/html/body/main/div[2]/div/p"));
 
+            int expectedNumberOfItems = 2;
+            int actualNumberOfItems = getNumberOfItemsInList(driver);
 
-            // Find the two items in the automation codes.
-            WebElement item1 = driver.findElement(By.xpath("/html/body/main/div[2]/div/ul/li[1]"));
-            WebElement item2 = driver.findElement(By.xpath("/html/body/main/div[2]/div/ul/li[2]"));
-
-            // Click on the two items.
-            item1.click();
-            item2.click();
-
-
-            // Verify that two lists are listed on the page.
-            //List<WebElement> lists = driver.findElements(By.className("grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"));
-
-            //Assert.assertEquals(lists.size(), 1);
-
-
-        }catch(Exception e) {
-
-            Assert.fail("There is no match!Found X items and flight tickets");
+            if (actualNumberOfItems != expectedNumberOfItems) {
+                throw new RuntimeException("The number of list elements does not match the expected number.");
+            } else {
+                System.out.println("X is equal to the expected value");
+            }
         }
+
+        private int getNumberOfItemsInList(WebDriver driver) {
+            return driver.findElements(By.cssSelector("body > main > div.mt-24.max-w-5xl.w-full.justify-center.items-center.text-sm.lg\\:flex > div > ul > li:nth-child(1) body > main > div.mt-24.max-w-5xl.w-full.justify-center.items-center.text-sm.lg\\:flex > div > ul > li:nth-child(2)")).size();
         }
     }
+
 
